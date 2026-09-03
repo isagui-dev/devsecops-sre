@@ -21,7 +21,7 @@ jobs:
       - name: Instalar dependencias
         run: |
           python -m pip install --upgrade pip
-          pip install -r app/requirements.txt bandit
+          pip install -r app/requirements.txt bandit pytest
 
       - name: Pruebas unitarias (Pytest)
         run: |
@@ -36,7 +36,7 @@ jobs:
           docker build -t app-local:${{ github.sha }} .
 
       - name: Escaneo de vulnerabilidades (Trivy)
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@0.28.0
         with:
           image-ref: 'app-local:${{ github.sha }}'
           format: 'table'
