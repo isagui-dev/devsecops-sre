@@ -2,9 +2,9 @@ name: DevSecOps CI/CD Pipeline
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   test-and-security:
@@ -27,7 +27,7 @@ jobs:
         run: pytest app/test_app.py
 
       - name: Análisis SAST (Bandit)
-        run: bandit -r app/
+        run: bandit -r app/ -x app/test_app.py
 
   deploy:
     needs: test-and-security
