@@ -2,38 +2,54 @@ version: '3.8'
 
 services:
   app:
-    build: .
+    image: nicolassteven/devsecops-sre:latest
     container_name: api-flask
     restart: always
-    ports:
-      - "5000:5000"
     environment:
-      - MYSQL_HOST=db
-      - MYSQL_USER=user
-      - MYSQL_PASSWORD=password
-      - MYSQL_DB=devsecops_db
+      - FLASK_ENV: production
+      - MYSQL_HOST: db
+      - MYSQL_USER: ${MYSQL_USER}
+      - MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      - MYSQL_DB: devsecops_db
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    networks:
+      - app-network
 
   db:
     image: mysql:8.0
-    container_name: servidor-bd-ejemplo
+    container_name: servidor-bd
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: devsecops_db
-      MYSQL_USER: user
-      MYSQL_PASSWORD: password
-    ports:
-      - "3306:3306"
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: users
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
       - mysql_data:/var/lib/mysql
+    networks:
+      - app-network
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "localhost",
+          "-u",
+          "root",
+          "-p${MYSQL_ROOT_PASSWORD}",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   # --- NGINX PROXY MANAGER ---
   nginx-proxy-manager:
-    image: 'jc21/nginx-proxy-manager:latest'
+    image: jc21/nginx-proxy-manager:latest
     container_name: nginx-proxy-manager
-    restart: always
     ports:
       - '80:80'
       - '81:81'
@@ -41,29 +57,40 @@ services:
     volumes:
       - ./npm_data:/data
       - ./npm_letsencrypt:/etc/letsencrypt
+    networks:
+      - app-network
 
   # --- UPTIME KUMA ---
-  uptime-kuma:
-    image: louislam/uptime-kuma:1
-    container_name: uptime-kuma
-    restart: always
-    ports:
-      - "3001:3001"
-    volumes:
-      - uptime_kuma_data:/app/data
+  # uptime-kuma:
+  #   image: louislam/uptime-kuma:1
+  #   container_name: uptime-kuma
+  #   restart: always
+  #   ports:
+  #     - "3001:3001"
+  #   volumes:
+  #     - uptime_kuma_data:/app/data
+  #   networks:
+  #     - app-network
 
-  # --- DOZZLE ---
-  dozzle:
-    image: amir20/dozzle:latest
-    container_name: dozzle
-    restart: always
-    ports:
-      - "8080:8080"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    environment:
-      - DOZZLE_NO_ANALYTICS=true
+  # # --- DOZZLE ---
+  # dozzle:
+  #   image: amir20/dozzle:latest
+  #   container_name: dozzle
+  #   restart: always
+  #   ports:
+  #     - "8080:8080"
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #   environment:
+  #     - DOZZLE_NO_ANALYTICS=true
+  #   networks:
+  #     - app-network
 
 volumes:
+  npm_data:
+  npm_letsencrypt:
   mysql_data:
-  uptime_kuma_data:
+  # uptime_kuma_data:
+
+networks:
+  app-network:
