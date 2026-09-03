@@ -50,16 +50,17 @@ jobs:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
-      - name: Despliegue remoto por SSH
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
-          script: |
-            cd /home/ubuntu/devsecops-sre
-            git remote set-url origin https://github.com/isagui-dev/devsecops-sre.git
-            git fetch origin main
-            git reset --hard origin/main
-            docker compose down
-            docker compose up -d --build
+     -name: Despliegue remoto por SSH
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USERNAME }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        command_timeout: 15m
+        script: |
+          cd /home/ubuntu/devsecops-sre
+          git remote set-url origin https://github.com/isagui-dev/devsecops-sre.git
+          git fetch origin main
+          git reset --hard origin/main
+          docker compose down
+          docker compose up -d --build
