@@ -3,7 +3,7 @@ FROM python
 RUN apt-get update && apt-get upgrade -y
 WORKDIR /home/app
 
-COPY app/requirements.txt .
+COPY requirements.txt .
 RUN pip install -r requirements.txt
 
 COPY . .
