@@ -45,7 +45,7 @@ jobs:
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
 
-  deploy:
+deploy:
     needs: test-and-security
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
@@ -59,6 +59,7 @@ jobs:
           script: |
             cd /home/ubuntu/devsecops-sre
             git remote set-url origin https://github.com/isagui-dev/devsecops-sre.git
-            git pull origin main
+            git fetch origin main
+            git reset --hard origin/main
             docker compose down
             docker compose up -d --build
