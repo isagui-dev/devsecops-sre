@@ -49,7 +49,7 @@ jobs:
           push: false
           load: true
           no-cache: true
-          tags: lejackouioui/final-app:latest
+          tags: nicolassteven/devsecops-sre:latest
 
 #      - name: Escanear contenedor con trivy
 #        uses: aquasecurity/trivy-action@master
@@ -62,7 +62,7 @@ jobs:
 #          severity: "CRITICAL,HIGH"
 
       - name: Subir la imagen a Docker Hub
-        run: docker push lejackouioui/final-app:latest
+        run: docker push nicolassteven/devsecops-sre:latest
 
       - name: Desplegar en servidor cloud
         uses: appleboy/ssh-action@v1.0.3
