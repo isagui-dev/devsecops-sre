@@ -58,6 +58,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             cd /home/ubuntu/devsecops-sre
+            git remote set-url origin https://github.com/isagui-dev/devsecops-sre.git
             git pull origin main
             docker compose down
             docker compose up -d --build
