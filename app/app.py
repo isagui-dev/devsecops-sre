@@ -3,13 +3,13 @@ from prometheus_client import Counter, generate_latest, CONTENT_TYPE_LATEST
 
 app = Flask(__name__)
 
-# Métrica SRE: Contador de peticiones HTTP
+# Métrica SRE
 REQUEST_COUNT = Counter('http_requests_total', 'Total de peticiones HTTP', ['method', 'endpoint', 'status'])
 
 @app.route('/')
 def home():
     REQUEST_COUNT.labels(method='GET', endpoint='/', status='200').inc()
-    return jsonify({"status": "ok", "message": "DevSecOps & SRE App Running"})
+    return jsonify({"status": "healthy", "message": "DevSecOps & SRE App Running"})
 
 @app.route('/health')
 def health():
