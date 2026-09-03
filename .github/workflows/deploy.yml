@@ -1,64 +1,63 @@
-name: CI/CD DevSecOps Pipeline
+name: DevSecOps CI/CD Pipeline
 
 on:
   push:
-    branches: [main, "feature/**"]
+    branches: [ "main" ]
   pull_request:
-    branches: [main]
+    branches: [ "main" ]
 
 jobs:
-  security_and_tests:
-    name: Análisis DevSecOps y Pruebas Unitarias
+  test-and-security:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout del código
         uses: actions/checkout@v4
 
-      - name: Configurar Python 3.11
+      - name: Configurar Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: '3.11'
 
-      - name: Instalar dependencias y Bandit
+      - name: Instalar dependencias
         run: |
           python -m pip install --upgrade pip
           pip install -r app/requirements.txt bandit
 
-      # - name: Escaneo SAST del código con Bandit
-      #   run: |
-      #     bandit -r app/ -ll -iii
-
-      - name: Ejecutar pruebas unitarias con Pytest
+      - name: Pruebas unitarias (Pytest)
         run: |
           pytest app/test_app.py
 
-      - name: Construir imagen Docker local
+      - name: Análisis SAST (Bandit)
         run: |
-          docker build -t app-local:test .
+          bandit -r app/ -ll
 
-      # - name: Escaneo de Vulnerabilidades con Trivy
-      #   uses: aquasecurity/trivy-action@master
-      #   with:
-      #     image-ref: 'app-local:test'
-      #     format: 'table'
-      #     exit-code: '1'
-      #     ignore-unfixed: true
-      #     vuln-type: 'os,library'
-      #     severity: 'CRITICAL,HIGH'
+      - name: Construir imagen Docker para análisis
+        run: |
+          docker build -t app-local:${{ github.sha }} .
+
+      - name: Escaneo de vulnerabilidades (Trivy)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'app-local:${{ github.sha }}'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
 
   deploy:
-    name: Despliegue en Producción
-    needs: security_and_tests
+    needs: test-and-security
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
-      - name: Despliegue SSH a EC2
+      - name: Despliegue remoto por SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            cd ~/devsecops-sre
+            cd /home/ubuntu/devsecops-sre
             git pull origin main
+            docker compose down
             docker compose up -d --build
