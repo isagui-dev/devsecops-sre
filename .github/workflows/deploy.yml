@@ -71,7 +71,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            cd ~/final-flask-app
+            cd ~/final-flask-app/devsecops-sre
             git pull origin main
             docker compose pull app
             docker compose up -d
