@@ -1,30 +1,60 @@
+version: '3.8'
+
 services:
-  api:
+  # --- API FLASK ---
+  app:
     build: .
-    container_name: devsecops-sre-api
+    container_name: api-flask
+    restart: always
     ports:
       - "5000:5000"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    restart: always
-
-  prometheus:
-    image: prom/prometheus:latest
-    container_name: devsecops-prometheus
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-    ports:
-      - "9090:9090"
-    restart: always
-
-  grafana:
-    image: grafana/grafana:latest
-    container_name: devsecops-grafana
-    ports:
-      - "3000:3000"
+    environment:
+      - MYSQL_HOST=db
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=password
+      - MYSQL_DB=devsecops_db
     depends_on:
-      - prometheus
+      - db
+
+  # --- BASE DE DATOS MYSQL ---
+  db:
+    image: mysql:8.0
+    container_name: servidor-bd-ejemplo
     restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: devsecops_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  # --- UPTIME KUMA (MONITOREO) ---
+  uptime-kuma:
+    image: louislam/uptime-kuma:1
+    container_name: uptime-kuma
+    restart: always
+    ports:
+      - "3001:3001"
+    volumes:
+      - uptime_kuma_data:/app/data
+
+  # --- DOZZLE (LOGS EN VIVO) ---
+  dozzle:
+    image: amir20/dozzle:latest
+    container_name: dozzle
+    restart: always
+    ports:
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      # Credenciales exigidas por la guía: ProfeChristian / Evidencia2
+      - DOZZLE_AUTH_PROVIDER=simple
+      - DOZZLE_NO_ANALYTICS=true
+
+volumes:
+  mysql_data:
+  uptime_kuma_data:
