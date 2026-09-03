@@ -6,11 +6,11 @@ services:
     container_name: api-flask
     restart: always
     environment:
-      - FLASK_ENV: production
-      - MYSQL_HOST: db
-      - MYSQL_USER: ${MYSQL_USER}
-      - MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      - MYSQL_DB: devsecops_db
+      - FLASK_ENV=production
+      - MYSQL_HOST=db
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=users
     depends_on:
       db:
         condition: service_healthy
