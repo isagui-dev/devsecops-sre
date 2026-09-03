@@ -3,6 +3,9 @@ from prometheus_client import Counter, generate_latest, CONTENT_TYPE_LATEST
 
 app = Flask(__name__)
 
+# Simulación de falla de seguridad (SAST)
+DB_PASSWORD = "SuperSecretPassword123!"
+
 # Métrica SRE
 REQUEST_COUNT = Counter('http_requests_total', 'Total de peticiones HTTP', ['method', 'endpoint', 'status'])
 
