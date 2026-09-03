@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Página Web Básica</title>
+    <!-- Vinculación con el archivo CSS externo -->
+    <link rel="stylesheet" href="{{url_for('static', filename='styles.css')}}">
+</head>
+<body>
+
+    <!-- Encabezado con navegación -->
+    <header>
+        <div class="logo">MiProyecto</div>
+        <nav>
+            <ul>
+                <li><a href="#" class="active">Inicio</a></li>
+                <li><a href="#">Servicios</a></li>
+                <li><a href="#">Contacto</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Contenido principal -->
+    <main>
+        <section class="hero">
+            <h2>Bienvenido a mi sitio web</h2>
+            <p>Esta es una plantilla inicial profesional estructurada con HTML5 semántico y estilizada con CSS3 puro. Es rápida, ligera y adaptable a cualquier dispositivo.</p>
+            <a href="#" class="btn">Explorar más</a>
+        </section>
+
+        <section class="features">
+            <div class="card">
+                <div class="icon">📱</div>
+                <h3>Diseño Responsivo</h3>
+                <p>Se adapta automáticamente a pantallas de celulares, tablets y computadoras de escritorio mediante CSS Grid.</p>
+            </div>
+            <div class="card">
+                <div class="icon">🚀</div>
+                <h3>HTML5 Limpio</h3>
+                <p>Uso de etiquetas semánticas para garantizar una estructura clara, accesible y optimizada para motores de búsqueda.</p>
+            </div>
+            <div class="card">
+                <div class="icon">🎨</div>
+                <h3>Estilos Modernos</h3>
+                <p>Uso de Flexbox, CSS Grid y variables CSS para mantener un código limpio, modular y fácil de personalizar.</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Pie de página -->
+    <footer>
+        <h3>{{ db_status }}</h3>
+        <p>&copy; 2026 MiProyecto. Todos los derechos reservados.</p>
+    </footer>
+
+</body>
+</html>

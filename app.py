@@ -1,24 +1,27 @@
-from flask import Flask, jsonify
-from prometheus_client import Counter, generate_latest, CONTENT_TYPE_LATEST
+import pymysql
+import os
+from flask import Flask, render_template, url_for
 
 app = Flask(__name__)
 
-# Métrica SRE
-REQUEST_COUNT = Counter('http_requests_total', 'Total de peticiones HTTP', ['method', 'endpoint', 'status'])
-
 @app.route('/')
 def home():
-    REQUEST_COUNT.labels(method='GET', endpoint='/', status='200').inc()
-    return jsonify({"status": "healthy", "message": "DevSecOps & SRE App Running"})
+    usuarios = []
+    try:
+        conn = pymysql.connect(
+            host='db',
+            user=os.getenv('MYSQL_USER'),
+            password=os.getenv('MYSQL_PASSWORD'),
+            database=os.getenv('MYSQL_DATABASE')
+        )
+        conn.close()
+        db_status = "Connected to the database successfully."
+    except Exception as e:
+        app.logger.error(f"DB connection error: {e}")
+        db_status = "Error connecting to the database."
 
-@app.route('/health')
-def health():
-    return jsonify({"status": "healthy"}), 200
-
-@app.route('/metrics')
-def metrics():
-    return generate_latest(), 200, {'Content-Type': CONTENT_TYPE_LATEST}
+    return render_template('index.html', db_status=db_status, usuarios=usuarios)
 
 if __name__ == '__main__':
-    debug_mode = os.getenv('FLASK_DEBUG', 'False').lower() == 'True'
+    debug_mode = os.getenv('FLASK_DEBUG', 'False').lower() == 'true'
     app.run(host='0.0.0.0', port=5050, debug=debug_mode)  # nosec B104
