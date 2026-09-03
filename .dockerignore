@@ -1,0 +1,4 @@
+/npm_data
+venv/
+__pycache/
+.env
