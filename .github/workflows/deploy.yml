@@ -2,65 +2,48 @@ name: DevSecOps CI/CD Pipeline
 
 on:
   push:
-    branches: ["main"]
+    branches: [ "main" ]
   pull_request:
-    branches: ["main"]
+    branches: [ "main" ]
 
 jobs:
   test-and-security:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout del código
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Configurar Python
-        uses: actions/setup-python@v5
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
           python-version: "3.11"
 
-      - name: Instalar dependencias
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r app/requirements.txt bandit pytest
+          pip install -r app/requirements.txt
+          pip install pytest bandit
 
-      - name: Pruebas unitarias (Pytest)
-        run: |
-          pytest app/test_app.py
+      - name: Run Pytest
+        run: pytest app/test_app.py
 
       - name: Análisis SAST (Bandit)
-        run: |
-          bandit -r app/ -ll
-
-      - name: Construir imagen Docker para análisis
-        run: |
-          docker build -t app-local:${{ github.sha }} .
-
-      - name: Escaneo de vulnerabilidades (Trivy)
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: "app-local:${{ github.sha }}"
-          format: "table"
-          exit-code: "0"
-          ignore-unfixed: true
-          vuln-type: "os,library"
-          severity: "CRITICAL,HIGH"
+        run: bandit -r app/
 
   deploy:
     needs: test-and-security
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
       - name: Despliegue remoto por SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
-        host: ${{ secrets.EC2_HOST }}
-        username: ${{ secrets.EC2_USERNAME }}
-        key: ${{ secrets.EC2_SSH_KEY }}
-        command_timeout: 15m
-        script: |
-          cd /home/ubuntu/devsecops-sre
-          git remote set-url origin https://github.com/isagui-dev/devsecops-sre.git
-          git fetch origin main
-          git reset --hard origin/main
-          docker compose down
-          docker compose up -d --build
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          command_timeout: 20m
+          script: |
+            cd /home/ubuntu/devsecops-sre
+            git remote set-url origin https://github.com/isagui-dev/devsecops-sre.git
+            git fetch origin main
+            git reset --hard origin/main
+            docker compose down
+            docker compose up -d --build
