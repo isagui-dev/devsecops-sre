@@ -6,7 +6,6 @@ app = Flask(__name__)
 
 @app.route('/')
 def home():
-    usuarios = []
     try:
         conn = pymysql.connect(
             host='db',
@@ -20,7 +19,7 @@ def home():
         app.logger.error(f"DB connection error: {e}")
         db_status = "Error connecting to the database."
 
-    return render_template('index.html', db_status=db_status, usuarios=usuarios)
+    return render_template('index.html', db_status=db_status)
 
 if __name__ == '__main__':
     debug_mode = os.getenv('FLASK_DEBUG', 'False').lower() == 'true'
