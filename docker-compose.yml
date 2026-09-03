@@ -1,7 +1,6 @@
 version: '3.8'
 
 services:
-  # --- API FLASK ---
   app:
     build: .
     container_name: api-flask
@@ -16,7 +15,6 @@ services:
     depends_on:
       - db
 
-  # --- BASE DE DATOS MYSQL ---
   db:
     image: mysql:8.0
     container_name: servidor-bd-ejemplo
@@ -31,7 +29,20 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
 
-  # --- UPTIME KUMA (MONITOREO) ---
+  # --- NGINX PROXY MANAGER ---
+  nginx-proxy-manager:
+    image: 'jc21/nginx-proxy-manager:latest'
+    container_name: nginx-proxy-manager
+    restart: always
+    ports:
+      - '80:80'
+      - '81:81'
+      - '443:443'
+    volumes:
+      - ./npm_data:/data
+      - ./npm_letsencrypt:/etc/letsencrypt
+
+  # --- UPTIME KUMA ---
   uptime-kuma:
     image: louislam/uptime-kuma:1
     container_name: uptime-kuma
@@ -41,7 +52,7 @@ services:
     volumes:
       - uptime_kuma_data:/app/data
 
-  # --- DOZZLE (LOGS EN VIVO) ---
+  # --- DOZZLE ---
   dozzle:
     image: amir20/dozzle:latest
     container_name: dozzle
@@ -51,8 +62,6 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
-      # Credenciales exigidas por la guía: ProfeChristian / Evidencia2
-      - DOZZLE_AUTH_PROVIDER=simple
       - DOZZLE_NO_ANALYTICS=true
 
 volumes:
