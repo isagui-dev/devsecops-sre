@@ -1,4 +1,4 @@
-FROM python:3.8
+FROM python
 
 RUN apt-get update && apt-get upgrade -y
 WORKDIR /home/app
