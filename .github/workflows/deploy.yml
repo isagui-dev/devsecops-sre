@@ -21,10 +21,10 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install pytest
+          pip install pytest bandit
 
-#      - name: Escaneo de seguridad con Bandit
-#        run: bandit -r . -s B101
+      - name: Escaneo de seguridad con Bandit
+        run: bandit -r . -s B101
 
       - name: Ejecutar pruebas
         run: pytest
@@ -51,15 +51,15 @@ jobs:
           no-cache: true
           tags: nicolassteven/devsecops-sre:latest
 
-#      - name: Escanear contenedor con trivy
-#        uses: aquasecurity/trivy-action@master
-#        with:
-#          image-ref: "lejackouioui/final-app:latest"
-#          format: "table"
-#          exit-code: "1"
-#          ignore-unfixed: true
-#          vuln-type: "os,library"
-#          severity: "CRITICAL,HIGH"
+      - name: Escanear contenedor con trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: "lejackouioui/final-app:latest"
+          format: "table"
+          exit-code: "1"
+          ignore-unfixed: true
+          vuln-type: "os,library"
+          severity: "CRITICAL,HIGH"
 
       - name: Subir la imagen a Docker Hub
         run: docker push nicolassteven/devsecops-sre:latest
