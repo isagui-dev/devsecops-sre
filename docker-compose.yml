@@ -60,37 +60,35 @@ services:
     networks:
       - app-network
 
-  # --- UPTIME KUMA ---
-  # uptime-kuma:
-  #   image: louislam/uptime-kuma:1
-  #   container_name: uptime-kuma
-  #   restart: always
-  #   ports:
-  #     - "3001:3001"
-  #   volumes:
-  #     - uptime_kuma_data:/app/data
-  #   networks:
-  #     - app-network
+  uptime-kuma:
+     image: louislam/uptime-kuma:1
+     container_name: uptime-kuma
+     restart: always
+     ports:
+       - "3001:3001"
+     volumes:
+       - uptime_kuma_data:/app/data
+     networks:
+       - app-network
 
-  # # --- DOZZLE ---
-  # dozzle:
-  #   image: amir20/dozzle:latest
-  #   container_name: dozzle
-  #   restart: always
-  #   ports:
-  #     - "8080:8080"
-  #   volumes:
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #   environment:
-  #     - DOZZLE_NO_ANALYTICS=true
-  #   networks:
-  #     - app-network
+  dozzle:
+     image: amir20/dozzle:latest
+     container_name: dozzle
+     restart: always
+     ports:
+       - "8080:8080"
+     volumes:
+       - /var/run/docker.sock:/var/run/docker.sock
+     environment:
+       - DOZZLE_NO_ANALYTICS=true
+     networks:
+       - app-network
 
 volumes:
   npm_data:
   npm_letsencrypt:
   mysql_data:
-  # uptime_kuma_data:
+  uptime_kuma_data:
 
 networks:
   app-network:
