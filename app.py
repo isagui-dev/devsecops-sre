@@ -11,7 +11,7 @@ def home():
         conn = pymysql.connect(
             host='db',
             user=os.getenv('MYSQL_USER'),
-            password=os.getenv('MYSQL_PASSWORD'),
+            password='MYSQL_PASSWORD',
             database=os.getenv('MYSQL_DATABASE')
         )
         conn.close()
